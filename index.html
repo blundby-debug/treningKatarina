@@ -92,7 +92,7 @@
 
 const PROGRAMS = {
   d1:{name:"Dag 1 — Glute/Ham A",sub:"Tung",ex:[
-    {id:"r1",ord:"—",name:"RDL — ramping",type:"ramp",rampSets:[
+    {id:"r1",ord:"—",name:"RDL — ramping",type:"ramp",rest:150,rampSets:[
       {label:"1",reps:"8",note:"Moderat, 2–3 reps før failure"},
       {label:"2",reps:"5",note:"Tyngre, 1–2 reps før failure"},
       {label:"3",reps:"3",note:"Til reell failure"},
@@ -103,8 +103,9 @@ const PROGRAMS = {
     {id:"a3",ord:"C",name:"Bulgarian split squat",type:"iso",sets:3,reps:"8–12",rest:90,fields:["kg","reps"],note:"Torso-lent fremover for glute-bias"},
     {id:"a4",ord:"D",name:"Sittende ham curl",type:"iso",sets:3,reps:"10–15",rest:90},
     {id:"a5",ord:"E",name:"Hip abduction maskin",type:"iso",sets:3,reps:"15–25",rest:90,note:"Lent fremover for øvre glute"},
-    {id:"a6",ord:"F",name:"Cable kickback",type:"iso",sets:2,reps:"15–20",rest:90},
-    {id:"a7",ord:"G",name:"Dead bug",type:"iso",sets:2,reps:"12–15",rest:60,note:"Anteriør kjerne mot bekken-tilt"},
+    {id:"a6",ord:"F",name:"Cable kickback",type:"iso",sets:3,reps:"15–20",rest:90},
+    {id:"a6b",ord:"G",name:"Monster walk (banded)",type:"iso",sets:3,reps:"20 skritt/vei",rest:60,fields:["motstand","skritt"],note:"Gluteus medius — sidelengs, hold spenning i band hele tiden"},
+    {id:"a7",ord:"H",name:"Dead bug",type:"iso",sets:2,reps:"12–15",rest:60,note:"Anteriør kjerne mot bekken-tilt"},
   ]},
   d2:{name:"Dag 2 — Overkropp A",sub:"Holdning + skulder",ex:[
     {id:"m1",ord:"—",name:"Thorakal mobilisering",type:"mob",sets:1,reps:"5–10 min",rest:0,note:"Foam roller tverrgående øvre rygg, cat-cow, thorakal rotasjon — FØR løft"},
@@ -116,7 +117,7 @@ const PROGRAMS = {
     {id:"b6",ord:"F",name:"Band pull-apart",type:"iso",sets:3,reps:"20–25",rest:60},
   ]},
   d3:{name:"Dag 3 — Glute/Ham B",sub:"Volum",ex:[
-    {id:"r2",ord:"—",name:"Hip thrust — ramping",type:"ramp",rampSets:[
+    {id:"r2",ord:"—",name:"Hip thrust — ramping",type:"ramp",rest:150,rampSets:[
       {label:"1",reps:"8",note:"Moderat, 2–3 reps før failure"},
       {label:"2",reps:"5",note:"Tyngre, 1–2 reps før failure"},
       {label:"3",reps:"3",note:"Til reell failure"},
@@ -125,9 +126,9 @@ const PROGRAMS = {
     {id:"c1",ord:"A",name:"Hip thrust — arbeidssett",type:"main",sets:3,reps:"12–15",rest:120},
     {id:"c2",ord:"B",name:"Single leg hip press",type:"iso",sets:3,reps:"10–12",rest:120},
     {id:"c3",ord:"C",name:"Liggende ham curl",type:"iso",sets:4,reps:"10–15",rest:90},
-    {id:"c4",ord:"D",name:"Cable/band abduction",type:"iso",sets:3,reps:"20–30",rest:60,note:"Drop hvile siste sett"},
+    {id:"c4",ord:"D",name:"Cable/band abduction",type:"iso",sets:4,reps:"20–30",rest:60,note:"Drop hvile siste sett"},
     {id:"c5",ord:"E",name:"Cable kickback",type:"iso",sets:2,reps:"15–20",rest:90},
-    {id:"c6",ord:"F",name:"Frog pump (banded)",type:"iso",sets:2,reps:"20–25",rest:60},
+    {id:"c6",ord:"F",name:"Frog pump (banded)",type:"iso",sets:3,reps:"20–25",rest:60},
     {id:"c7",ord:"G",name:"Dead bug",type:"iso",sets:2,reps:"12–15",rest:60},
   ]},
   d4:{name:"Dag 4 — Overkropp B",sub:"Holdning + arm",ex:[
@@ -223,7 +224,7 @@ function exCard(e){
     <div class="exhead"><div class="ord">${e.ord}</div>
       <div style="flex:1"><div class="exname">${e.name}</div>
         <div class="meta"><span class="tag ${tCls(e.type)}">${tLbl(e.type)}</span>
-          ${e.type!=="mob"?`<span class="reps">${e.reps} ${e.rest?`· pause ${e.rest>=180?"3 min":e.rest+" sek"}`:""}</span>`:`<span class="reps">${e.reps}</span>`}
+          ${e.type!=="mob"?`<span class="reps">${e.reps?e.reps+" ":""}${e.rest?`· pause ${e.rest>=180?"3 min":e.rest+" sek"}`:""}</span>`:`<span class="reps">${e.reps}</span>`}
           ${prev?`<span class="reps">· sist ${fmtDate(prev.date)}</span>`:""}</div></div></div>
     ${e.note?`<div class="note${isRamp?" ramp":""}">${e.note}</div>`:""}
     ${e.type==="mob"?"":`<div class="sets">${sets.map((s,i)=>setRow(e,i,s,prev&&prev.sets[i],fields)).join("")}</div>`}
