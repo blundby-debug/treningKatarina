@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>Katarina — Trening</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0a0c10">
+<style>
+  :root{--bg:#0a0c10;--card:#14181f;--card2:#1b212b;--line:#262d39;--txt:#e9edf3;
+    --mut:#8a929f;--acc:#ff5a9e;--su:#3b82f6;--ok:#10b981;--warn:#e0b341}
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;background:var(--bg);color:var(--txt);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;font-size:16px;line-height:1.4}
+  .wrap{max-width:580px;margin:0 auto;padding:calc(14px + env(safe-area-inset-top)) 14px 130px}
+  h1{font-size:20px;margin:4px 0 2px;letter-spacing:-.3px}
+  .sub{color:var(--mut);font-size:13px;margin-bottom:14px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:12px}
+  .day{display:flex;justify-content:space-between;align-items:center;background:var(--card2);
+    border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:10px;cursor:pointer}
+  .day b{font-size:17px}
+  .day small{color:var(--mut);font-size:12px}
+  .btn{appearance:none;border:none;border-radius:12px;font-size:15px;font-weight:600;padding:13px;
+    color:var(--txt);background:var(--card2);cursor:pointer;width:100%;text-align:center}
+  .btn:active{transform:scale(.99)}
+  .primary{background:var(--acc);color:#2b0016}
+  .back{background:none;border:none;color:var(--acc);font-size:15px;padding:6px 0;cursor:pointer;font-weight:600}
+  .tag{font-size:11px;font-weight:700;padding:3px 7px;border-radius:6px;white-space:nowrap}
+  .t-ramp{background:rgba(224,179,65,.18);color:var(--warn)}
+  .t-main{background:rgba(255,90,158,.16);color:var(--acc)}
+  .t-iso{background:#2a313d;color:#aab2c0}
+  .ex{border:1px solid var(--line);border-radius:14px;padding:12px;margin-bottom:10px;background:var(--card)}
+  .ex.done{border-color:rgba(16,185,129,.4)}
+  .ex.ramp{border-color:rgba(224,179,65,.35)}
+  .exhead{display:flex;gap:10px;align-items:flex-start}
+  .ord{min-width:30px;height:30px;border-radius:8px;background:var(--card2);display:flex;align-items:center;
+    justify-content:center;font-weight:700;font-size:13px;color:var(--mut);flex:0 0 auto}
+  .exname{font-weight:600;font-size:15.5px;line-height:1.25}
+  .meta{display:flex;gap:6px;flex-wrap:wrap;margin-top:5px;align-items:center}
+  .reps{font-size:12px;color:var(--mut)}
+  .note{font-size:12px;color:var(--mut);margin-top:7px;line-height:1.35;border-left:2px solid var(--line);padding-left:8px}
+  .note.ramp{border-color:var(--warn);color:#f0d090}
+  .sets{margin-top:11px}
+  .set{display:flex;gap:7px;align-items:center;margin-bottom:7px}
+  .snum{min-width:18px;color:var(--mut);font-size:13px;font-weight:600}
+  .rlabel{min-width:54px;font-size:11px;color:var(--warn);text-align:center;flex:0 0 auto}
+  .prev{font-size:11px;color:var(--mut);text-align:center;min-width:54px;flex:0 0 auto}
+  .fld{flex:1;position:relative}
+  .fld input{width:100%;background:var(--card2);border:1px solid var(--line);border-radius:10px;color:var(--txt);
+    font-size:17px;font-weight:600;padding:11px 10px;text-align:center}
+  .fld input:focus{outline:none;border-color:var(--acc)}
+  .fld .lab{position:absolute;right:9px;top:50%;transform:translateY(-50%);font-size:11px;color:var(--mut);pointer-events:none}
+  .chk{width:42px;height:42px;border-radius:10px;border:1px solid var(--line);background:var(--card2);
+    display:flex;align-items:center;justify-content:center;font-size:18px;flex:0 0 auto;cursor:pointer}
+  .chk.on{background:var(--ok);border-color:var(--ok);color:#04130d}
+  .chips{display:flex;gap:8px;flex-wrap:wrap}
+  .chip{background:var(--card2);border:1px solid var(--line);border-radius:999px;padding:9px 12px;font-size:13px;cursor:pointer}
+  .chip.on{border-color:var(--ok);color:var(--ok)}
+  .kvi{display:flex;justify-content:space-between;font-size:13px;color:var(--mut);padding:3px 0;gap:10px}
+  .kvi b{color:var(--txt);font-weight:600;text-align:right}
+  .bar{position:fixed;left:0;right:0;bottom:0;background:linear-gradient(transparent,var(--bg) 26%);
+    padding:14px 14px calc(14px + env(safe-area-inset-bottom));display:flex;gap:10px;max-width:580px;margin:0 auto}
+  .modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:flex-end;z-index:50}
+  .modal.on{display:flex}
+  .sheet{background:var(--card);border-radius:18px 18px 0 0;padding:18px 18px calc(18px + env(safe-area-inset-bottom));
+    width:100%;max-width:580px;margin:0 auto;max-height:82vh;overflow:auto}
+  .it{margin:12px 0;font-size:14px}.it b{color:var(--acc)}
+  .timer{position:fixed;right:14px;bottom:calc(92px + env(safe-area-inset-bottom));background:var(--card2);
+    border:1px solid var(--line);border-radius:14px;padding:10px 12px;display:flex;gap:8px;align-items:center;
+    z-index:30;box-shadow:0 8px 24px rgba(0,0,0,.4)}
+  .timer .t{font-size:20px;font-weight:700;font-variant-numeric:tabular-nums;min-width:46px;text-align:center}
+  .timer button{background:var(--card);border:1px solid var(--line);color:var(--txt);border-radius:9px;width:34px;height:34px;font-size:15px;cursor:pointer}
+  .small{font-size:12px;color:var(--mut)}
+  .toast{position:fixed;left:50%;bottom:calc(130px + env(safe-area-inset-bottom));transform:translateX(-50%);
+    background:var(--ok);color:#04130d;padding:11px 18px;border-radius:12px;font-weight:600;z-index:60;opacity:0;transition:.2s;pointer-events:none}
+  .toast.on{opacity:1}
+  .row{display:flex;gap:10px}
+  textarea{width:100%;background:var(--card2);color:var(--txt);border:1px solid var(--line);border-radius:10px;
+    padding:10px;font-size:12px;font-family:ui-monospace,monospace}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+<div class="modal" id="modal" onclick="if(event.target.id==='modal')closeModal()"><div class="sheet" id="sheet"></div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* Lagring: localStorage. Prefix egen for Katarina slik at det ikke kolliderer med andre PWA-er på samme enhet. */
+
+const PROGRAMS = {
+  d1:{name:"Dag 1 — Glute/Ham A",sub:"Tung",ex:[
+    {id:"r1",ord:"—",name:"RDL — ramping",type:"ramp",rampSets:[
+      {label:"1",reps:"8",note:"Moderat, 2–3 reps før failure"},
+      {label:"2",reps:"5",note:"Tyngre, 1–2 reps før failure"},
+      {label:"3",reps:"3",note:"Til reell failure"},
+      {label:"4",reps:"1–2",note:"Enda tyngre, til reell failure"},
+    ],note:"Kalibrerer nevral kapasitet i lav rep-range. Aldri >5% vektøkning før dette har kjørt 3–4 uker."},
+    {id:"a1",ord:"A",name:"RDL — arbeidssett",type:"main",sets:3,reps:"6–10",rest:180,note:"Hoftehengsel, strekk i ham i bunn"},
+    {id:"a2",ord:"B",name:"Hip thrust",type:"main",sets:4,reps:"6–10",rest:180,note:"2 sek hold i topp"},
+    {id:"a3",ord:"C",name:"Bulgarian split squat",type:"iso",sets:3,reps:"8–12",rest:90,fields:["kg","reps"],note:"Torso-lent fremover for glute-bias"},
+    {id:"a4",ord:"D",name:"Sittende ham curl",type:"iso",sets:3,reps:"10–15",rest:90},
+    {id:"a5",ord:"E",name:"Hip abduction maskin",type:"iso",sets:3,reps:"15–25",rest:90,note:"Lent fremover for øvre glute"},
+    {id:"a6",ord:"F",name:"Cable kickback",type:"iso",sets:2,reps:"15–20",rest:90},
+    {id:"a7",ord:"G",name:"Dead bug",type:"iso",sets:2,reps:"12–15",rest:60,note:"Anteriør kjerne mot bekken-tilt"},
+  ]},
+  d2:{name:"Dag 2 — Overkropp A",sub:"Holdning + skulder",ex:[
+    {id:"m1",ord:"—",name:"Thorakal mobilisering",type:"mob",sets:1,reps:"5–10 min",rest:0,note:"Foam roller tverrgående øvre rygg, cat-cow, thorakal rotasjon — FØR løft"},
+    {id:"b1",ord:"A",name:"Chest supported row",type:"iso",sets:3,reps:"10–12",rest:120},
+    {id:"b2",ord:"B",name:"Lat pulldown",type:"iso",sets:3,reps:"10–12",rest:120},
+    {id:"b3",ord:"C",name:"Face pull",type:"iso",sets:4,reps:"15–20",rest:90,note:"Kjernen i anti-kyfose"},
+    {id:"b4",ord:"D",name:"Lateral raise",type:"iso",sets:4,reps:"12–20",rest:90},
+    {id:"b5",ord:"E",name:"Prone Y-raise (skrå benk)",type:"iso",sets:3,reps:"12–15",rest:90,note:"Nedre trapp, tommel opp"},
+    {id:"b6",ord:"F",name:"Band pull-apart",type:"iso",sets:3,reps:"20–25",rest:60},
+  ]},
+  d3:{name:"Dag 3 — Glute/Ham B",sub:"Volum",ex:[
+    {id:"r2",ord:"—",name:"Hip thrust — ramping",type:"ramp",rampSets:[
+      {label:"1",reps:"8",note:"Moderat, 2–3 reps før failure"},
+      {label:"2",reps:"5",note:"Tyngre, 1–2 reps før failure"},
+      {label:"3",reps:"3",note:"Til reell failure"},
+      {label:"4",reps:"1–2",note:"Enda tyngre, til reell failure"},
+    ],note:"Kalibrerer nevral kapasitet i lav rep-range. Aldri >5% vektøkning før dette har kjørt 3–4 uker."},
+    {id:"c1",ord:"A",name:"Hip thrust — arbeidssett",type:"main",sets:3,reps:"12–15",rest:120},
+    {id:"c2",ord:"B",name:"Single leg hip press",type:"iso",sets:3,reps:"10–12",rest:120},
+    {id:"c3",ord:"C",name:"Liggende ham curl",type:"iso",sets:4,reps:"10–15",rest:90},
+    {id:"c4",ord:"D",name:"Cable/band abduction",type:"iso",sets:3,reps:"20–30",rest:60,note:"Drop hvile siste sett"},
+    {id:"c5",ord:"E",name:"Cable kickback",type:"iso",sets:2,reps:"15–20",rest:90},
+    {id:"c6",ord:"F",name:"Frog pump (banded)",type:"iso",sets:2,reps:"20–25",rest:60},
+    {id:"c7",ord:"G",name:"Dead bug",type:"iso",sets:2,reps:"12–15",rest:60},
+  ]},
+  d4:{name:"Dag 4 — Overkropp B",sub:"Holdning + arm",ex:[
+    {id:"m2",ord:"—",name:"Thorakal mobilisering",type:"mob",sets:1,reps:"5–10 min",rest:0,note:"Samme som dag 2 — FØR løft"},
+    {id:"e1",ord:"A",name:"Semi wide cable row",type:"iso",sets:3,reps:"12",rest:120},
+    {id:"e2",ord:"B",name:"Single-arm pulldown",type:"iso",sets:3,reps:"10–12",rest:90},
+    {id:"e3",ord:"C",name:"Reverse flyes",type:"iso",sets:3,reps:"15–20",rest:90},
+    {id:"e4",ord:"D",name:"Lateral raise",type:"iso",sets:4,reps:"15–20",rest:90},
+    {id:"e5",ord:"E",name:"Wall slide / chin tuck",type:"iso",sets:3,reps:"10",rest:60},
+    {id:"e6",ord:"F",name:"Biceps curl",type:"iso",sets:2,reps:"12–15",rest:60},
+    {id:"e7",ord:"G",name:"Triceps ext",type:"iso",sets:2,reps:"12–15",rest:60},
+  ]},
+};
+const ORDER=["d1","d2","d3","d4"];
+
+let view="home", current=null, draft=null;
+const $=s=>document.querySelector(s);
+const tCls=t=>t==="ramp"?"t-ramp":t==="main"?"t-main":"t-iso";
+const tLbl=t=>t==="ramp"?"RAMP":t==="main"?"HOVED":t==="mob"?"MOB":"ISO";
+const today=()=>{const d=new Date(),p=n=>String(n).padStart(2,"0");return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}`};
+const fmtDate=d=>new Date(d).toLocaleDateString("no-NO",{day:"numeric",month:"short"});
+
+const PRE="kt:";
+const sget=k=>{try{const r=localStorage.getItem(PRE+k);return r?JSON.parse(r):null}catch{return null}};
+const sset=(k,v)=>{try{localStorage.setItem(PRE+k,JSON.stringify(v));return true}catch{return false}};
+
+const exLog=(wk,id)=>sget(`log:${wk}:${id}`)||[];
+const lastEntry=(wk,id)=>{const log=exLog(wk,id);
+  for(let i=log.length-1;i>=0;i--){if(log[i].date.slice(0,10)===today())continue;return log[i];}return null;};
+
+function render(){view==="home"?renderHome():view==="workout"?renderWorkout():renderHistory();}
+
+/* ---------- HOME ---------- */
+function renderHome(){
+  $("#app").innerHTML=`
+  <h1>Katarina — Trening</h1>
+  <div class="sub">Glute/ham + holdning · WBFF-prep · 1–2 RIR (0–1 RIR siste 1–2 uker)</div>
+  ${ORDER.map(wk=>{const p=PROGRAMS[wk], meta=sget(`meta:${wk}`);
+    return `<div class="day" onclick="openWorkout('${wk}')">
+      <div><b>${p.name}</b><br><small>${p.sub} · ${p.ex.length} øvelser${meta?` · sist ${fmtDate(meta.last)}`:" · ikke logget"}</small></div>
+      <div style="color:var(--acc);font-size:22px">›</div></div>`;}).join("")}
+  <div class="card">
+    <div style="font-weight:600;margin-bottom:10px">I dag · ${fmtDate(today())}</div>
+    <div class="chips" id="daily"></div>
+  </div>
+  <div class="row">
+    <button class="btn" onclick="showInfo()">Om ramping</button>
+    <button class="btn" onclick="view='history';render()">Historikk</button>
+  </div>
+  <div class="row" style="margin-top:10px">
+    <button class="btn" onclick="exportData()">Eksporter</button>
+    <button class="btn" onclick="importData()">Importer</button>
+  </div>`;
+  renderDaily();
+}
+function renderDaily(){
+  const st=sget("daily:"+today())||{};
+  const items=[["vacuum","Vacuum 6 hold"],["posture","Holdningssjekk (skuldre ned/bak)"]];
+  const el=$("#daily");if(!el)return;
+  el.innerHTML=items.map(([id,l])=>`<div class="chip ${st[id]?"on":""}" onclick="toggleDaily('${id}')">${st[id]?"✓":"○"} ${l}</div>`).join("");
+}
+function toggleDaily(id){const k="daily:"+today();const st=sget(k)||{};st[id]=!st[id];sset(k,st);renderDaily();}
+
+/* ---------- WORKOUT ---------- */
+function openWorkout(wk){
+  current=wk;draft={};
+  PROGRAMS[wk].ex.forEach(e=>{
+    const n = e.type==="ramp" ? e.rampSets.length : e.sets;
+    const log=exLog(wk,e.id), lastL=log[log.length-1];
+    if(lastL&&lastL.date.slice(0,10)===today()){
+      draft[e.id]=lastL.sets.map(s=>({a:s.a,b:s.b,done:!!s.done}));
+      while(draft[e.id].length<n)draft[e.id].push({a:"",b:"",done:false});
+    } else draft[e.id]=Array.from({length:n},()=>({a:"",b:"",done:false}));
+  });
+  view="workout";render();window.scrollTo(0,0);
+}
+function renderWorkout(){
+  const p=PROGRAMS[current];
+  $("#app").innerHTML=`
+  <button class="back" onclick="finishWorkout()">‹ Ferdig / tilbake</button>
+  <h1>${p.name}</h1>
+  <div class="sub">${p.sub} · alt lagres automatisk mens du fyller inn</div>
+  ${p.ex.map(e=>exCard(e)).join("")}
+  <div class="bar"><button class="btn primary" onclick="finishWorkout()">Ferdig med økt ✓</button></div>`;
+  renderTimer();
+}
+function exCard(e){
+  const sets=draft[e.id], prev=lastEntry(current,e.id);
+  const fields=e.fields||["kg","reps"];
+  const allDone=sets.length&&sets.every(s=>s.done);
+  const isRamp=e.type==="ramp";
+  return `<div class="ex ${allDone?"done":""} ${isRamp?"ramp":""}" id="ex-${e.id}">
+    <div class="exhead"><div class="ord">${e.ord}</div>
+      <div style="flex:1"><div class="exname">${e.name}</div>
+        <div class="meta"><span class="tag ${tCls(e.type)}">${tLbl(e.type)}</span>
+          ${e.type!=="mob"?`<span class="reps">${e.reps} ${e.rest?`· pause ${e.rest>=180?"3 min":e.rest+" sek"}`:""}</span>`:`<span class="reps">${e.reps}</span>`}
+          ${prev?`<span class="reps">· sist ${fmtDate(prev.date)}</span>`:""}</div></div></div>
+    ${e.note?`<div class="note${isRamp?" ramp":""}">${e.note}</div>`:""}
+    ${e.type==="mob"?"":`<div class="sets">${sets.map((s,i)=>setRow(e,i,s,prev&&prev.sets[i],fields)).join("")}</div>`}
+  </div>`;
+}
+function setRow(e,i,s,pv,fields){
+  const single=fields.length===1;
+  const isRamp=e.type==="ramp";
+  const label=isRamp?e.rampSets[i].label:String(i+1);
+  const rampNote=isRamp?e.rampSets[i].reps:"";
+  const prevTxt=pv?(single?`${pv.a||"–"}s`:`${pv.a||"–"}×${pv.b||"–"}`):"–";
+  return `<div class="set"><span class="snum">${label}</span>
+    ${isRamp?`<span class="rlabel">${rampNote}r</span>`:`<span class="prev">${prevTxt}</span>`}
+    <div class="fld"><input inputmode="decimal" value="${s.a}" placeholder="${pv?pv.a:""}"
+      oninput="upd('${e.id}',${i},'a',this.value)"><span class="lab">${fields[0]}</span></div>
+    ${single?"":`<div class="fld"><input inputmode="numeric" value="${s.b}" placeholder="${pv?pv.b:""}"
+      oninput="upd('${e.id}',${i},'b',this.value)"><span class="lab">${fields[1]}</span></div>`}
+    <div class="chk ${s.done?"on":""}" onclick="toggleDone('${e.id}',${i})">${s.done?"✓":""}</div></div>`;
+}
+
+const pending={};
+function upd(id,i,k,v){draft[id][i][k]=v;clearTimeout(pending[id]);pending[id]=setTimeout(()=>persistEx(id),400);}
+function toggleDone(id,i){
+  draft[id][i].done=!draft[id][i].done;persistEx(id);
+  const e=PROGRAMS[current].ex.find(x=>x.id===id);
+  if(draft[id][i].done && e.rest)startTimer(e.rest);
+  $("#ex-"+id).outerHTML=exCard(e);
+}
+function persistEx(id){
+  const sets=draft[id];
+  if(!sets.some(s=>s.a||s.b||s.done))return;
+  const key=`log:${current}:${id}`;
+  const log=sget(key)||[];
+  const entry={date:new Date().toISOString(),sets:sets.map(s=>({a:s.a,b:s.b,done:s.done}))};
+  if(log.length&&log[log.length-1].date.slice(0,10)===today())log[log.length-1]=entry;
+  else log.push(entry);
+  if(log.length>80)log.splice(0,log.length-80);
+  sset(key,log);
+}
+function finishWorkout(){
+  for(const id of Object.keys(pending)){clearTimeout(pending[id]);persistEx(id);}
+  const any=Object.values(draft).some(arr=>arr.some(s=>s.a||s.b||s.done));
+  if(any){sset(`meta:${current}`,{last:new Date().toISOString()});toast("Økt lagret ✓");}
+  view="home";current=null;draft=null;stopTimer();render();
+}
+
+/* ---------- HISTORY ---------- */
+function renderHistory(){
+  let html="";
+  for(const wk of ORDER){const p=PROGRAMS[wk];let inner="";
+    for(const e of p.ex){if(e.type==="mob")continue;const log=exLog(wk,e.id);if(!log.length)continue;
+      const f=e.fields||["kg","reps"];
+      const rows=[...log].reverse().slice(0,12).map(en=>{
+        const sets=en.sets.filter(s=>s.a||s.b).map(s=>f.length===1?`${s.a}s`:`${s.a}×${s.b}`).join("  ");
+        return `<div class="kvi"><span>${fmtDate(en.date)}</span><b>${sets||"—"}</b></div>`;
+      }).join("");
+      inner+=`<div style="margin-top:10px"><div style="font-weight:600;font-size:14px">${e.name}</div>${rows}</div>`;}
+    if(inner)html+=`<div class="card"><b>${p.name}</b>${inner}</div>`;}
+  $("#app").innerHTML=`<button class="back" onclick="view='home';render()">‹ Tilbake</button>
+  <h1>Historikk</h1><div class="sub">Per øvelse — nyeste først</div>
+  ${html||`<div class="card small">Ingen logger ennå.</div>`}`;
+}
+
+/* ---------- EKSPORT / IMPORT ---------- */
+function allData(){const out={};for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);
+  if(k.startsWith(PRE))out[k.slice(PRE.length)]=JSON.parse(localStorage.getItem(k));}return out;}
+function exportData(){
+  const json=JSON.stringify({app:"katarina-trening",v:1,exported:new Date().toISOString(),data:allData()},null,1);
+  try{const blob=new Blob([json],{type:"application/json"});const a=document.createElement("a");
+    a.href=URL.createObjectURL(blob);a.download="katarina-trening-"+today()+".json";a.click();
+    setTimeout(()=>URL.revokeObjectURL(a.href),2000);}catch{}
+  $("#sheet").innerHTML=`<h3>Eksportert</h3>
+  <div class="small">Filen lastes ned. Du kan også kopiere teksten til Notater.</div>
+  <textarea readonly style="height:34vh;margin-top:10px">${json.replace(/</g,"&lt;")}</textarea>
+  <button class="btn primary" style="margin-top:10px" onclick="navigator.clipboard.writeText(window._e).then(()=>toast('Kopiert'))">Kopier</button>
+  <button class="btn" style="margin-top:8px" onclick="closeModal()">Lukk</button>`;
+  window._e=json;$("#modal").classList.add("on");
+}
+function importData(){
+  $("#sheet").innerHTML=`<h3>Importer</h3><div class="small">Lim inn innholdet fra en eksportert fil.</div>
+  <textarea id="imp" placeholder="Lim inn JSON her…" style="height:30vh;margin-top:10px"></textarea>
+  <button class="btn primary" style="margin-top:10px" onclick="doImport()">Importer (erstatter)</button>
+  <button class="btn" style="margin-top:8px" onclick="closeModal()">Avbryt</button>`;
+  $("#modal").classList.add("on");
+}
+function doImport(){try{const o=JSON.parse($("#imp").value);const data=o.data||o;
+  Object.entries(data).forEach(([k,v])=>sset(k,v));closeModal();toast("Importert ✓");render();}
+  catch{toast("Ugyldig JSON");}}
+
+/* ---------- INFO ---------- */
+function showInfo(){
+  $("#sheet").innerHTML=`<h3>Ramping-protokoll</h3>
+  <div class="small">RDL (dag 1) og Hip thrust (dag 3) — før arbeidssettene</div>
+  <div class="it"><b>Hvorfor:</b> Trening til failure ved høye reps bygger lokal utholdenhet i motorenheter, ikke evnen til å rekruttere høy-terskel motorenheter under tung, lav-reps last. Det er derfor 12 reps kan falle til 1 rep ved 10% mer vekt — kapasiteten i det lave rep-området er aldri trent.</div>
+  <div class="it"><b>Protokollen:</b> 8 reps (buffer) → 5 reps (buffer) → 3 reps til reell failure → 1–2 reps til reell failure ved enda tyngre vekt. De to siste settene er ekte failure-sett i lav rep-range — det er der kapasiteten bygges.</div>
+  <div class="it"><b>Vektøkningsregel:</b> aldri mer enn 5% økning på hovedløft før rampingen har kjørt sammenhengende i 3–4 uker. Store hopp (10%+) er nettopp det som utløser kollaps fra mange reps til én, fordi nevral kapasitet i det tunge området ikke er kalibrert ennå.</div>
+  <div class="it" style="border-top:1px solid var(--line);padding-top:12px"><b>Thorakal mobilisering:</b> gjøres FØR løft på overkroppsdagene, ikke etter — målet er å øke tilgjengelig bevegelsesutslag før belastning, ikke bare tøye ut en allerede belastet rygg.</div>
+  <button class="btn primary" style="margin-top:8px" onclick="closeModal()">Lukk</button>`;
+  $("#modal").classList.add("on");
+}
+function closeModal(){$("#modal").classList.remove("on");}
+
+/* ---------- toast & timer ---------- */
+let tt;function toast(m){const t=$("#toast");t.textContent=m;t.classList.add("on");clearTimeout(tt);tt=setTimeout(()=>t.classList.remove("on"),1600);}
+let timerSec=0,timerInt=null;
+function renderTimer(){
+  let el=$("#timer");
+  if(view!=="workout"){if(el)el.remove();return;}
+  if(!el){el=document.createElement("div");el.className="timer";el.id="timer";document.body.appendChild(el);}
+  el.innerHTML=`<button onclick="addTime(-15)">−</button><span class="t" id="ttxt">${fmtT(timerSec)}</span>
+    <button onclick="addTime(15)">+</button>
+    <button onclick="${timerInt?"stopTimer()":"startTimer(90)"}" style="width:44px">${timerInt?"■":"▶"}</button>`;
+}
+function fmtT(s){const m=Math.floor(s/60),x=s%60;return (m?m+":":"")+String(x).padStart(m?2:1,"0")+(m?"":"s");}
+function startTimer(s){timerSec=s;clearInterval(timerInt);timerInt=setInterval(()=>{
+  timerSec--;const t=$("#ttxt");if(t)t.textContent=fmtT(timerSec);
+  if(timerSec<=0){stopTimer();if(navigator.vibrate)navigator.vibrate([200,100,200]);toast("Pause ferdig");}
+},1000);renderTimer();}
+function stopTimer(){clearInterval(timerInt);timerInt=null;renderTimer();}
+function addTime(d){timerSec=Math.max(0,timerSec+d);const t=$("#ttxt");if(t)t.textContent=fmtT(timerSec);}
+
+render();
+if("serviceWorker" in navigator)navigator.serviceWorker.register("sw.js").catch(()=>{});
+</script>
+</body>
+</html>
